@@ -1,0 +1,115 @@
+<style>
+
+</style>
+
+<script type="text/html" data-template-name="device in">
+  <div class="form-row">
+    <label for="node-input-broker"><i class="fa fa-globe"></i> Broker</label>
+    <input type="text" id="node-input-broker" />
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-friendlyName"><i class="fa fa-tasks"></i> Device</label>
+    <input type="text" id="node-input-friendlyName" placeholder="My Device" />
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-qos">
+        <i class="fa fa-empire"></i> <abbr title="Quality of Service">QoS</abbr>
+    </label>
+    <select id="node-input-qos" style="width:70%">
+      <option value="0">At most once (0)</option>
+      <option value="1">At least once (1)</option>
+      <option value="2">Exactly once (2)</option>
+    </select>
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-baseTopic">
+        <i class="fa fa-tasks"></i> Base Topic
+    </label>
+    <input type="text" id="node-input-baseTopic" placeholder="zigbee2mqtt" />
+  </div>
+
+  <div class="form-row mqtt-flags-row mqtt5">
+    <label for="node-input-nl">
+        <i class="fa fa-flag"></i>
+        <span>Flags</span>
+    </label>
+    <div class="mqtt-flags">
+      <div class="mqtt-flag">
+        <label for="node-input-nl" title="No local">
+          <input type="checkbox" id="node-input-nl" />
+          Don't receive own published messages
+        </label>
+      </div>
+      <div class="mqtt-flag">
+        <label for="node-input-rap" title="Retain as Published">
+          <input type="checkbox" id="node-input-rap" />
+          Keep retain flag of original publication
+        </label>
+      </div>
+    </div>
+  </div>
+  <div class="form-row mqtt5">
+    <label for="node-input-rh"><i class="fa fa-tag"></i> <abbr title="Retain Handling">R.H.</abbr></label>
+    <select id="node-input-rh" style="width:70%">
+      <option value="0">Send retained messages</option>
+      <option value="1">Only send for new subscriptions</option>
+      <option value="2">Don't send</option>
+    </select>
+  </div>
+
+  <div class="form-row">
+    <label style="margin-left:105px;display:flex;align-items:end;width:auto" for="node-input-subscribeOnConnect">
+      <input style="width:auto;margin-right:4px;" type="checkbox" id="node-input-subscribeOnConnect" />
+      Subscribe On Connect
+    </label>
+  </div>
+
+</script>
+
+<script type="text/javascript">
+  RED.nodes.registerType("device in", {
+    category: "zigbee2mqtt",
+    defaults: {
+      friendlyName: {
+        value: "",
+        required: true,
+      },
+      baseTopic: {
+        value: "zigbee2mqtt",
+        required: true,
+      },
+      subscribeOnConnect: { value: true },
+      qos: { value: 0 },
+      broker: { type: "mqtt-broker", required: true },
+      nl: { value: false },
+      rap: { value: true },
+      rh: { value: 0 },
+    },
+    color: "#ffc135",
+    inputs: 1,
+    outputs: 1,
+    icon: "font-awesome/fa-map-signs",
+    label() {
+      return this.friendlyName || "device in"
+    },
+    labelStyle() {
+      return this.name ? "node_label_italic" : ""
+    },
+    oneditprepare() {
+      $("#node-input-broker").on("change", () => {
+        const confNode = RED.nodes.node($("#node-input-broker").val())
+        if (confNode && confNode.protocolVersion === "5") {
+          $("div.form-row.mqtt5").show()
+        } else {
+          $("div.form-row.mqtt5").hide()
+        }
+      })
+      if (this.qos === undefined) {
+        $("#node-input-qos").val(2)
+      }
+    },
+  })
+</script>
