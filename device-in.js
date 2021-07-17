@@ -111,17 +111,11 @@ module.exports = (RED) => {
 
     onMessage = (topic, message, { qos, retain }) => {
       if (isUtf8(message)) {
-        message = message.toString()
+        message = message.toString("utf8")
         try {
           message = JSON.parse(message)
         } catch (e) {
-          this.error("unable to parse MQTT message as JSON", {
-            message,
-            topic,
-            qos,
-            retain,
-          })
-          return
+          // ignore
         }
       } else {
         this.error("unknown message encoding", {
